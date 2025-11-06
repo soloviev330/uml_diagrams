@@ -1,0 +1,16 @@
+@startuml hw_4
+actor User as U
+participant "Web UI" as WI
+participant "Order Controller" as OC
+participant "Payment Service" as PS
+database "Database" as DB
+
+U -> WI : Запрос на оформление заказа
+WI -> OC : Передача данных заказа
+OC -> DB : Сохранение заказа
+OC <-- DB : Заказ сохранен
+OC -> PS : Проведение платежа
+OC <-- PS :Результаты проведения платежа
+WI <-- OC : Подтверждение заказа
+U <-- WI : Уведомление о подтверждении заказа
+@enduml

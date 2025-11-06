@@ -1,0 +1,86 @@
+@startuml hw_4_3
+actor User as U
+participant "Web UI" as WI
+participant "Order Controller" as OC
+participant "Payment Service" as PS
+database "Database"  as DB #yellow
+participant "Notification service" as NS
+actor Manager as M
+
+group "1 оформление заказа"
+U -> WI : Запрос на оформление заказа
+activate U
+activate WI
+WI -> OC : Передача данных заказа
+activate OC
+OC -[#green]> DB : Сохранение заказа
+activate DB
+OC <-- DB : Заказ сохранен
+deactivate DB
+end
+
+group "2. Оплата"
+OC -> PS : Проведение платежа
+activate PS
+alt Успешная оплата
+OC <[#green]-- PS :Подтверждение платежа
+OC -[#lightblue]> NS
+activate NS
+else Ошибка оплаты
+OC <[#red]-- PS :Ошибка платежа
+deactivate PS
+note right of OC
+Заказ сохраняется, как "предварительный"
+end note
+OC -> DB : Изменение статуса заказа
+activate DB
+OC <[#green]-- DB : Заказ сохранен
+deactivate DB
+end
+end
+
+group "3. Подтверждение заказа"
+WI <[#green]-- OC : Подтверждение заказа
+deactivate OC
+U <-- WI : Отображение статуса заказа
+deactivate WI
+U <[#lightblue]-- NS : Уведомление о подтверждении заказа
+deactivate U
+end
+
+group "4. Консультация пользователя"
+note right of NS
+Уведомление менеджера для проверки позиций по заказу
+end note
+
+NS -> M : Уведомление о новом заказе
+deactivate NS
+end
+
+group "5. Изменение корзины"
+
+U -> WI : Изменение заказа
+activate U
+activate WI
+note right of WI
+Доступно изменение количества и номенклатуры
+end note
+WI -> OC : Обновленый состав заказа
+activate OC
+OC -> DB : Изменение состава заказа
+activate DB
+OC <-- DB : Заказ сохранен
+deactivate DB
+WI <[#green]-- OC : Подтверждение изменений заказа
+deactivate OC
+U <-- WI : Отображение обновленного состава заказа
+deactivate WI
+deactivate U
+end
+
+
+
+
+
+
+@enduml

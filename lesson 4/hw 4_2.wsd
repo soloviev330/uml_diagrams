@@ -1,0 +1,39 @@
+@startuml hw_4
+actor User as U
+participant "Web UI" as WI
+participant "Order Controller" as OC
+participant "Payment Service" as PS
+database "Database"  as DB #yellow
+participant "Notification service" as NS
+
+group "1 оформление заказа"
+U -> WI : Запрос на оформление заказа
+activate U
+
+WI -> OC : Передача данных заказа
+activate WI
+
+OC -[#green]> DB : Сохранение заказа
+activate DB
+activate OC
+OC <-- DB : Заказ сохранен
+deactivate DB
+end
+group "2. Оплата"
+OC -> PS : Проведение платежа
+activate PS
+alt Успешная оплата
+OC <[#green]-- PS :Подтверждение платежа
+OC -[#lightblue]> NS
+else Ошибка оплаты
+OC <[#red]-- PS :Ошибка платежа
+deactivate PS
+end
+
+end
+WI <-- OC : Подтверждение заказа
+deactivate OC
+U <-- WI : Уведомление о подтверждении заказа
+
+
+@enduml
