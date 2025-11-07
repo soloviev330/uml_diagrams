@@ -7,25 +7,25 @@ class PaymentManager {
 }
 
 class Payment {
-    -id
-    -amount
-    -paymentDate
-    -transactionId
+    -id : int
+    -amount : double
+    -paymentDate : date
+    -transactionId : int
     -processPayment()
     -Payment(id,amount,paymentDate,transactionId)
 }
 
 abstract class CashPayment {
-    -cashProvided
+    -cashProvided : double
     -changeCalculation()
-    -processPayment()
+    -processPayment() : double
     -CashPayment(id,amount,paymentDate,transactionId,cashProvided)
 }
 
 abstract class CardPayment {
-    -cardNumber
-    -cardHolder
-    -expiryDate
+    -cardNumber : string
+    -cardHolder : string
+    -expiryDate : date
     -validation()
     -processPayment()
    - CardPayment(id,amount,paymentDate,transactionId,cardNumber,cardHolder,expiryDate)
