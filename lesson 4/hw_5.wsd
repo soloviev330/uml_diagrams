@@ -1,0 +1,42 @@
+@startuml asd
+
+class PaymentManager {
+    -List<Payment>payments
+    -registerPayment()
+    -processAllPayments()
+}
+
+class Payment {
+    -id
+    -amount
+    -paymentDate
+    -transactionId
+    -processPayment()
+    -Payment(id,amount,paymentDate,transactionId)
+}
+
+abstract class CashPayment {
+    -cashProvided
+    -changeCalculation()
+    -processPayment()
+    -CashPayment(id,amount,paymentDate,transactionId,cashProvided)
+}
+
+abstract class CardPayment {
+    -cardNumber
+    -cardHolder
+    -expiryDate
+    -validation()
+    -processPayment()
+   - CardPayment(id,amount,paymentDate,transactionId,cardNumber,cardHolder,expiryDate)
+}
+
+PaymentManager o-- Payment
+Payment <|-- CashPayment
+Payment <|-- CardPayment
+
+
+
+@enduml
+
+
