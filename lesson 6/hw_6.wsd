@@ -1,0 +1,83 @@
+hw_6.wsd
+
+@startuml
+title Диаграмма классов системы онлайн-образования
+
+
+class User {
+  - userId: int
+  - email: string
+  - password: string
+  - name: string
+  + resetPassword(): void
+}
+
+class Student {
+  - studentId: int
+  - userId: int
+  + enrollInCourse(): void
+}
+
+class Instructor {
+  - instructorId: int
+  - department: string
+  - userId: int
+  + createCourse(): void
+}
+
+
+class Course {
+  - courseId: int
+  - courseName: string
+  - description: string
+  - instructorId: int
+  + addMaterial(): void
+  + getStudents(): list
+}
+
+
+
+class Material {
+  - materialId: int
+  - materialName: string
+  - fileUrl: string
+  - courseId: int
+  + download(): void
+}
+
+
+
+class Enroll {
+  - enrollId: int
+  - studentId: int
+  - courseId: int
+  - enrollmentDate: date
+  - grade: decimal
+  + updateGrade(): void
+}
+
+
+' Наследование
+User <|-- Student : наследование\n(студент — подтип пользователя)
+User <|-- Instructor : наследование\n(преподаватель — подтип пользователя)
+
+
+' Ассоциация
+Instructor "1" --- "0..*" Course : ведет курсы\n(ассоциация, 1:*)
+
+
+' Композиция
+Course "1" *--- "1..*" Material : композиция\n(при удалении курса\nудаляются материалы)
+
+
+' Ассоциативный класс
+Student "0..*" -- "0..*" Course
+(Student, Course) . Enroll : ассоциативный класс\n(зачисление)
+
+
+
+' Зависимость
+Student ..> Material : зависимость\n(использует материалы)
+
+
+@enduml
