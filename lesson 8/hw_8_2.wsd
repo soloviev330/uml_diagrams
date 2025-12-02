@@ -1,0 +1,79 @@
+@startuml
+title Процесс онлайн-перевода между счетами
+
+participant "Клиент" as Client
+participant "Мобильное приложение" as App
+participant "Бэкенд" as Backend
+participant "База данных" as DB
+participant "СМС-сервис" as SMS
+
+Client -> App: Ввод данных перевода\n(сумма, получатель)
+activate App
+
+App -> App: Валидация формы
+
+App -> Backend: Запрос на перевод (синхронный)
+activate Backend
+
+
+
+alt Баланс ≥ Сумма перевода
+  
+  Backend -> DB: Проверить существование получателя
+  activate DB
+  DB --> Backend: Получатель найден
+  deactivate DB
+  
+
+  alt Сумма в пределах лимита
+    
+    Backend -> DB: Начать транзакцию
+    activate DB
+    
+    DB -> DB: Заблокировать средства
+    
+    Backend -> DB: Списать с счета отправителя
+    DB --> Backend: Списание выполнено
+    
+    Backend -> DB: Зачислить на счет получателя
+    DB --> Backend: Зачисление выполнено
+    
+    Backend -> DB: Зафиксировать транзакцию
+    DB --> Backend: Транзакция успешна
+    deactivate DB
+    
+    Backend --> App: Перевод успешен
+    App --> Client: Уведомление об успехе
+    
+
+    opt Сумма > 1000 руб.
+      Backend -->> SMS: Отправить СМС (асинхронный)
+      activate SMS
+      SMS -->> Client: СМС-уведомление о переводе
+      deactivate SMS
+    end
+    
+
+    opt Push-уведомления включены
+      App -->> Client: Push-уведомление (асинхронный)
+    end
+    
+  else Сумма превышает лимит
+    Backend --> App: Ошибка: "Превышен дневной лимит"
+    App --> Client: Сообщение об ошибке
+  end
+  
+else Недостаточно средств
+  Backend --> App: Ошибка: "Недостаточно средств"
+  App --> Client: Сообщение об ошибке
+  
+
+  opt Клиент имеет кредитную линию
+    App --> Client: Предложить кредит
+  end
+  
+end
+
+deactivate Backend
+deactivate App
+@enduml
